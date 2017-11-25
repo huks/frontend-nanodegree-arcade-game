@@ -1,19 +1,28 @@
-// Enemies our player must avoid
-var Enemy = function(speed) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+// Constant variables...
+const X_UNIT = function(n=1) {
+    return 101 * n;
+}
+const Y_UNIT = function(n=1) {
+    return 83 * n;
+}
+const Y_SHIFT = 25;
+const HITBOX = 25;
 
+// Enemies our player must avoid
+var Enemy = function(row=0, speed) {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
 
+    // Enemy will be created by given row
+    this.row = row;
+
     // Setting the Enemy initial location
     this.x = 0;
-    this.y = 0;
+    this.y = Y_UNIT(this.row+1) - Y_SHIFT;
 
     // Setting the Enemy speed, random speed if undefined
     this.speed = (typeof speed !== 'undefined') ? speed : randomSpeed();
-    console.log("speed:" + this.speed);
 };
 
 /**
@@ -37,19 +46,18 @@ Enemy.prototype.update = function(dt) {
     this.x = this.x + this.speed;
 
     // Handles collision with the Player
-    // console.log("player", player.x, player.y);
-    var hitbox = 50;
-    if (this.x > player.x-hitbox && this.x < player.x+hitbox ) {
-        if (this.y > player.y-hitbox && this.y < player.y+hitbox) {
-            console.log('collison, mate');
+    if (this.x > player.x-HITBOX && this.x < player.x+HITBOX ) {
+        if (this.y > player.y-HITBOX && this.y < player.y+HITBOX) {
+            alert('Collison, mate');
+            player.init();
         }
     }
     
     // If the Enemy is out of bounday, delete then create a new one
-    if (this.x > 606) {
+    if (this.x > X_UNIT(6)) {
         var index = allEnemies.indexOf(this);
         allEnemies.splice(index, 1);
-        allEnemies.push(new Enemy());
+        allEnemies.push(new Enemy(this.row));
     }
 };
 
@@ -58,13 +66,19 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+// Player class requires an update(), render() and a handleInput() method.
 var Player = function() {
     this.sprite = 'images/char-boy.png';
-    this.x = 101;
-    this.y = 83;
+
+    this.init();
+}
+
+/**
+ * @description Setting the Player initial location
+ */
+Player.prototype.init = function() {
+    this.x = X_UNIT(2);
+    this.y = Y_UNIT(5) - Y_SHIFT;
 }
 
 /**
@@ -75,13 +89,10 @@ Player.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-
-    // Updates the Player location
 }
 
 // Draw the player on the screen, required method for game
 Player.prototype.render = function() {
-    // console.log("Player.render", this.x, this.y);
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
@@ -89,25 +100,36 @@ Player.prototype.render = function() {
  * @description handleInput
  */
 Player.prototype.handleInput = function(keyCode) {
+    // Recall that the player cannot move off screen
     switch(keyCode) {
         case 'left':
-            this.x -= 101;
+            if (this.x > 0) this.x -= X_UNIT();
             break;
         case 'up':
-            this.y -= 83;
+            this.y -= Y_UNIT();
+            // If the player reaches the water, the game should be reset
+            if (this.y < Y_UNIT() - Y_SHIFT) player.win();
             break;
         case 'right':
-            this.x += 101;
+            if (this.x < X_UNIT(4)) this.x += X_UNIT();
             break;
         case 'down':
-            this.y += 83;
+            if (this.y < Y_UNIT(5) - Y_SHIFT) this.y += Y_UNIT();
             break;
     }
 }
 
+Player.prototype.win = function() {
+    setTimeout(function(){
+        alert("You win!");
+        player.init();
+    }, 500);
+    
+}
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
-var allEnemies = [new Enemy(), new Enemy(1)];
+var allEnemies = [new Enemy(), new Enemy(1), new Enemy(2)];
 // Place the player object in a variable called player
 var player = new Player();
 
