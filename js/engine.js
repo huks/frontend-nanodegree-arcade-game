@@ -28,6 +28,16 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
+    /* Create the msg element, set default text, place below canvas */
+    var msg = document.createElement('P');
+    msg.setAttribute('id', 'game-message');
+    // creating msg txt here for now but better move to app.js?    
+    var text = document.createTextNode(
+        'PRESS < OR > TO CHOOSE A CHARACTER'
+    );
+    msg.appendChild(text);
+    doc.body.appendChild(msg);
+
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -64,8 +74,9 @@ var Engine = (function(global) {
      */
     function init() {
         reset();
+        showMessage();
         lastTime = Date.now();
-        main();
+        main();        
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -164,6 +175,13 @@ var Engine = (function(global) {
         // noop
     }
 
+    /* Show game staus message to msg object.
+     * No operation here - but implemnted in app.js
+     */
+    function showMessage(msg) {
+        // noop
+    }
+
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
      * all of these images are properly loaded our game will start.
@@ -185,4 +203,5 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+    global.msg = msg; // msg object added to the global
 })(this);
