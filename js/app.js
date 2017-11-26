@@ -1,14 +1,22 @@
-// Constant variables...
+/* Constant variables... */
+// Unit of X
 const X_UNIT = function(n=1) {
     return 101 * n;
 }
+// Unit of Y
 const Y_UNIT = function(n=1) {
     return 83 * n;
 }
+// Y shift parameter so the player algins center of the cell
 const Y_SHIFT = 25;
+// Size of the hitbox
 const HITBOX = 25;
 
-// Enemies our player must avoid
+/**
+ * @description Enemies our player must avoid
+ * @param {number} row Default=0
+ * @param {number} speed
+ */
 var Enemy = function(row=0, speed) {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
@@ -27,7 +35,7 @@ var Enemy = function(row=0, speed) {
 
 /**
  * @description Generate random speed
- * @return {int} range from min to max
+ * @return {number} Between min and max
  */
 var randomSpeed = function() {
     var min = 1;
@@ -35,8 +43,10 @@ var randomSpeed = function() {
     return Math.floor(Math.random() * (max-min)) + min;
 }
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
+/**
+ * @description Update the enemy's position, required method for game
+ * @param dt - A time delta between ticks
+ */
 Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
@@ -46,27 +56,46 @@ Enemy.prototype.update = function(dt) {
     this.x = this.x + this.speed;
 
     // Handles collision with the Player
+    this.checkCollisons();
+
+    // If the Enemy is out of bounday, delete then create a new one
+    this.outOfBounds();
+};
+
+/**
+ * @description Handles collision with the Player
+ */
+Enemy.prototype.checkCollisons = function() {
     if (this.x > player.x-HITBOX && this.x < player.x+HITBOX ) {
         if (this.y > player.y-HITBOX && this.y < player.y+HITBOX) {
             alert('Collison, mate');
             player.init();
         }
     }
-    
-    // If the Enemy is out of bounday, delete then create a new one
-    if (this.x > X_UNIT(6)) {
+}
+
+/**
+ * @description If the Enemy is out of bounds, delete then create a new one
+ * @param {number} n - Size of bounds. Default: X_UNIT(6)
+ */
+Enemy.prototype.outOfBounds = function(n=X_UNIT(6)) {
+    if (this.x > n) {
         var index = allEnemies.indexOf(this);
         allEnemies.splice(index, 1);
         allEnemies.push(new Enemy(this.row));
     }
-};
+}
 
-// Draw the enemy on the screen, required method for game
+/**
+ * @description Draw the enemy on the screen, required method for game
+ */
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Player class requires an update(), render() and a handleInput() method.
+/**
+ * @description Player class requires an update(), render() and a handleInput() method
+ */
 var Player = function() {
     this.sprite = 'images/char-boy.png';
 
@@ -83,7 +112,7 @@ Player.prototype.init = function() {
 
 /**
  * Update the player's position, required method for game
- * @param {*} dt a time delta between ticks
+ * @param dt - A time delta between ticks
  */
 Player.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
@@ -91,7 +120,9 @@ Player.prototype.update = function(dt) {
     // all computers.
 }
 
-// Draw the player on the screen, required method for game
+/**
+ * @description Draw the player on the screen, required method for game
+ */
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
@@ -119,6 +150,9 @@ Player.prototype.handleInput = function(keyCode) {
     }
 }
 
+/**
+ * @description If the player reaches the water, win!
+ */
 Player.prototype.win = function() {
     setTimeout(function(){
         alert("You win!");
