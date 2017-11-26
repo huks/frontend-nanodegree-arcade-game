@@ -8,7 +8,7 @@ const Y_UNIT = function(n=1) {
     return 83 * n;
 }
 // Y shift parameter so the player algins center of the cell
-const Y_SHIFT = 25;
+const Y_SHIFT = 40;
 // Size of the hitbox
 const HITBOX = 25;
 
@@ -97,9 +97,54 @@ Enemy.prototype.render = function() {
  * @description Player class requires an update(), render() and a handleInput() method
  */
 var Player = function() {
-    this.sprite = 'images/char-boy.png';
+    // constants...
+    this.CHARACTERS = ['images/char-boy.png', 'images/char-cat-girl.png', 'images/char-horn-girl.png'];
+    this.C_LEN = this.CHARACTERS.length-1;
+
+    this.boolSelected = false;
+    this.numSelection = -1; // if not selected default(-1) value returns error
+    this.sprite = 'images/Selector.png';
 
     this.init();
+}
+
+/**
+ * @description Left/Right to select character, Enter to confirm/start
+ * @param keyCode 
+ */
+Player.prototype.selectCharacter = function(keyCode) {
+    switch(keyCode) {
+        // Enter to finish character selection
+        case 'enter':
+            if (this.numSelection!=-1) {
+                this.boolSelected=!this.boolSelected;
+            }
+            break;
+        case 'left':
+            // handling default(-1)
+            if (this.numSelection==-1) {
+                this.numSelection+=this.C_LEN+1;
+                this.sprite = this.CHARACTERS[this.numSelection];
+            // when left ends
+            } else if (this.numSelection==0) {
+                this.numSelection+=this.C_LEN;
+                this.sprite = this.CHARACTERS[this.numSelection];
+            // otherwise continue left
+            } else {
+                this.sprite = this.CHARACTERS[--this.numSelection];
+            }
+            break;
+        case 'right':
+            // when right ends
+            if (this.numSelection==this.C_LEN) {
+                this.numSelection-=this.C_LEN;
+                this.sprite = this.CHARACTERS[this.numSelection];
+            // otherwise continue right
+            } else {
+                this.sprite = this.CHARACTERS[++this.numSelection];
+            }
+            break;
+    }
 }
 
 /**
@@ -108,6 +153,17 @@ var Player = function() {
 Player.prototype.init = function() {
     this.x = X_UNIT(2);
     this.y = Y_UNIT(5) - Y_SHIFT;
+}
+
+/**
+ * @description If the player reaches the water, win!
+ */
+Player.prototype.win = function() {
+    setTimeout(function(){
+        alert("You win!");
+        player.init();
+    }, 500);
+    
 }
 
 /**
@@ -131,34 +187,29 @@ Player.prototype.render = function() {
  * @description handleInput
  */
 Player.prototype.handleInput = function(keyCode) {
-    // Recall that the player cannot move off screen
-    switch(keyCode) {
-        case 'left':
-            if (this.x > 0) this.x -= X_UNIT();
-            break;
-        case 'up':
-            this.y -= Y_UNIT();
-            // If the player reaches the water, the game should be reset
-            if (this.y < Y_UNIT() - Y_SHIFT) player.win();
-            break;
-        case 'right':
-            if (this.x < X_UNIT(4)) this.x += X_UNIT();
-            break;
-        case 'down':
-            if (this.y < Y_UNIT(5) - Y_SHIFT) this.y += Y_UNIT();
-            break;
+    // If the player is not selected
+    if (this.boolSelected == false) {
+        player.selectCharacter(keyCode);
     }
-}
-
-/**
- * @description If the player reaches the water, win!
- */
-Player.prototype.win = function() {
-    setTimeout(function(){
-        alert("You win!");
-        player.init();
-    }, 500);
-    
+    // Recall that the player cannot move off screen
+    else {        
+        switch(keyCode) {
+            case 'left':
+                if (this.x > 0) this.x -= X_UNIT();
+                break;
+            case 'up':
+                this.y -= Y_UNIT();
+                // If the player reaches the water, the game should be reset
+                if (this.y < Y_UNIT() - Y_SHIFT) player.win();
+                break;
+            case 'right':
+                if (this.x < X_UNIT(4)) this.x += X_UNIT();
+                break;
+            case 'down':
+                if (this.y < Y_UNIT(5) - Y_SHIFT) this.y += Y_UNIT();
+                break;
+        }
+    }    
 }
 
 // Now instantiate your objects.
@@ -177,6 +228,7 @@ var player = new Player();
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
+        13: 'enter',
         37: 'left',
         38: 'up',
         39: 'right',
