@@ -113,11 +113,13 @@ var Player = function() {
  * @param keyCode 
  */
 Player.prototype.selectCharacter = function(keyCode) {
+    player.showMessage('PRESS ENTER TO START');
     switch(keyCode) {
         // Enter to finish character selection
         case 'enter':
             if (this.numSelection!=-1) {
                 this.boolSelected=!this.boolSelected;
+                player.showMessage('REACH THE WATER');               
             }
             break;
         case 'left':
@@ -152,7 +154,7 @@ Player.prototype.selectCharacter = function(keyCode) {
  */
 Player.prototype.init = function() {
     this.x = X_UNIT(2);
-    this.y = Y_UNIT(5) - Y_SHIFT;
+    this.y = Y_UNIT(5) - Y_SHIFT;    
 }
 
 /**
@@ -187,7 +189,6 @@ Player.prototype.render = function() {
  * @description handleInput
  */
 Player.prototype.handleInput = function(keyCode) {
-    console.log(this.x, this.y);
     // If the player is not selected
     if (this.boolSelected == false) {
         player.selectCharacter(keyCode);
@@ -218,6 +219,14 @@ Player.prototype.handleInput = function(keyCode) {
     }    
 }
 
+/**
+ * @description Show game status message
+ * @param {string} text 
+ */
+Player.prototype.showMessage = function(text) {
+    msg.innerHTML = text;
+}
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [
@@ -231,7 +240,6 @@ var allEnemies = [
 
 // Place the player object in a variable called player
 var player = new Player();
-
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
