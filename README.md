@@ -15,7 +15,6 @@ In this game you have a Player and Enemies (Bugs). The goal of the player is to 
 
 ### Todos
 
-- Player selection: allow the user to select the image for the player character before starting the game.
 - Score: you can implement a score for the game. For example, the score can increase each time the player reaches the water, and it can be reset to 0 when collision occurs (or it can be reduced).
 - Collectibles: you can add gems to the game, allowing the player to collect them to make the game more interesting.
 - Timed games
