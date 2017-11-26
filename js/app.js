@@ -163,7 +163,12 @@ Player.prototype.win = function() {
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
-var allEnemies = [new Enemy(), new Enemy(1), new Enemy(2)];
+var allEnemies = [
+    new Enemy(), new Enemy(),
+    new Enemy(1), new Enemy(1),
+    new Enemy(2), new Enemy(2)
+];
+
 // Place the player object in a variable called player
 var player = new Player();
 
