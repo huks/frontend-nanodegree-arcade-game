@@ -187,6 +187,7 @@ Player.prototype.render = function() {
  * @description handleInput
  */
 Player.prototype.handleInput = function(keyCode) {
+    console.log(this.x, this.y);
     // If the player is not selected
     if (this.boolSelected == false) {
         player.selectCharacter(keyCode);
@@ -198,9 +199,14 @@ Player.prototype.handleInput = function(keyCode) {
                 if (this.x > 0) this.x -= X_UNIT();
                 break;
             case 'up':
-                this.y -= Y_UNIT();
                 // If the player reaches the water, the game should be reset
-                if (this.y < Y_UNIT() - Y_SHIFT) player.win();
+                // this.y > 0 condition added to prevent multiple win popups
+                if (this.y <= Y_UNIT() - Y_SHIFT && this.y > 0) {
+                    this.y -= Y_UNIT();
+                    player.win();
+                } else if (this.y > 0) {
+                    this.y -= Y_UNIT();
+                }
                 break;
             case 'right':
                 if (this.x < X_UNIT(4)) this.x += X_UNIT();
@@ -215,9 +221,12 @@ Player.prototype.handleInput = function(keyCode) {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [
-    new Enemy(), new Enemy(),
-    new Enemy(1), new Enemy(1),
-    new Enemy(2), new Enemy(2)
+    new Enemy(),
+    new Enemy(0),
+    new Enemy(1),
+    new Enemy(1),
+    new Enemy(2),
+    new Enemy(2)
 ];
 
 // Place the player object in a variable called player
@@ -226,7 +235,8 @@ var player = new Player();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function(e) {
+// -> modifed to 'keydown' for 'professional' gameplay
+document.addEventListener('keydown', function(e) {
     var allowedKeys = {
         13: 'enter',
         37: 'left',
