@@ -113,7 +113,7 @@ var Player = function() {
  * @param keyCode 
  */
 Player.prototype.selectCharacter = function(keyCode) {
-    player.showMessage('PRESS ENTER TO START');
+    this.showMessage('PRESS ENTER TO START');
     switch(keyCode) {
         // Enter to finish character selection
         case 'enter':
@@ -163,8 +163,8 @@ Player.prototype.init = function() {
 Player.prototype.win = function() {
     setTimeout(function(){
         alert("You win!");
-        player.init();
-    }, 500);
+        this.init();
+    }.bind(this), 500); // add the bind method
     
 }
 
@@ -191,7 +191,7 @@ Player.prototype.render = function() {
 Player.prototype.handleInput = function(keyCode) {
     // If the player is not selected
     if (this.boolSelected == false) {
-        player.selectCharacter(keyCode);
+        this.selectCharacter(keyCode);
     }
     // Recall that the player cannot move off screen
     else {        
