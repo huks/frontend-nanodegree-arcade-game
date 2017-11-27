@@ -25,12 +25,13 @@ var Enemy = function(row=0, speed) {
     // Enemy will be created by given row
     this.row = row;
 
-    // Setting the Enemy initial location
-    this.x = 0;
-    this.y = Y_UNIT(this.row+1) - Y_SHIFT;
-
     // Setting the Enemy speed, random speed if undefined
     this.speed = (typeof speed !== 'undefined') ? speed : randomSpeed();
+    
+    // Setting the Enemy initial location
+    // this.x;
+    // this.y;
+    this.init();
 };
 
 /**
@@ -41,6 +42,14 @@ var randomSpeed = function() {
     var min = 1;
     var max = 10;
     return Math.floor(Math.random() * (max-min)) + min;
+}
+
+/**
+ * @description Setting the Enemy initial location
+ */
+Enemy.prototype.init = function() {
+    this.x = 0;
+    this.y = Y_UNIT(this.row+1) - Y_SHIFT;   
 }
 
 /**
@@ -60,6 +69,13 @@ Enemy.prototype.update = function(dt) {
 
     // If the Enemy is out of bounday, delete then create a new one
     this.outOfBounds();
+};
+
+/**
+ * @description Draw the enemy on the screen, required method for game
+ */
+Enemy.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 /**
@@ -87,33 +103,66 @@ Enemy.prototype.outOfBounds = function(n=X_UNIT(6)) {
 }
 
 /**
- * @description Draw the enemy on the screen, required method for game
- */
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-/**
  * @description Player class requires an update(), render() and a handleInput() method
  */
 var Player = function() {
+    // Enemy class inheritance...
+    Enemy.call(this);
+    this.sprite = 'images/Selector.png'; // if not assigned, enemy sprite returns
     // constants...
     this.CHARACTERS = ['images/char-boy.png', 'images/char-cat-girl.png', 'images/char-horn-girl.png'];
     this.C_LEN = this.CHARACTERS.length-1;
 
     this.boolSelected = false;
-    this.numSelection = -1; // if not selected default(-1) value returns error
-    this.sprite = 'images/Selector.png';
+    this.numSelection = -1; // if not selected default(-1) value returns error    
 
+    // Setting the Player initial location
     this.init();
+}
+
+// Extend a class...
+Player.prototype = Object.create(Enemy.prototype);
+Player.prototype.constructor = Player;
+
+/**
+ * @description Setting the Player initial location
+ */
+Player.prototype.init = function() {
+    // just practising inheritance
+    // no point of calling since it only assigns x and y...
+    // if not assigned here, enemy init position returns.
+    Enemy.prototype.init.call(this);
+    this.x = X_UNIT(2);
+    this.y = Y_UNIT(5) - Y_SHIFT;    
+}
+
+/**
+ * Update the player's position, required method for game
+ * @param dt - A time delta between ticks
+ */
+Player.prototype.update = function(dt) {
+    // You should multiply any movement by the dt parameter
+    // which will ensure the game runs at the same speed for
+    // all computers.
+
+    // Not practicing inheritnace because if I do,
+    // Player will move to right like Enemy
+    // since Enemy update hanldes movement.
+}
+
+/**
+ * @description Draw the player on the screen, required method for game
+ */
+Player.prototype.render = function() {
+    // Calling the same render method by inheriting Enemy
+    Enemy.prototype.render.call(this);
 }
 
 /**
  * @description Left/Right to select character, Enter to confirm/start
  * @param keyCode 
  */
-Player.prototype.selectCharacter = function(keyCode) {
-    this.showMessage('PRESS ENTER TO START');
+Player.prototype.selectCharacter = function(keyCode) {    
     switch(keyCode) {
         // Enter to finish character selection
         case 'enter':
@@ -123,6 +172,7 @@ Player.prototype.selectCharacter = function(keyCode) {
             }
             break;
         case 'left':
+            this.showMessage('PRESS ENTER TO START');
             // handling default(-1)
             if (this.numSelection==-1) {
                 this.numSelection+=this.C_LEN+1;
@@ -137,6 +187,7 @@ Player.prototype.selectCharacter = function(keyCode) {
             }
             break;
         case 'right':
+            this.showMessage('PRESS ENTER TO START');
             // when right ends
             if (this.numSelection==this.C_LEN) {
                 this.numSelection-=this.C_LEN;
@@ -150,39 +201,17 @@ Player.prototype.selectCharacter = function(keyCode) {
 }
 
 /**
- * @description Setting the Player initial location
- */
-Player.prototype.init = function() {
-    this.x = X_UNIT(2);
-    this.y = Y_UNIT(5) - Y_SHIFT;    
-}
-
-/**
  * @description If the player reaches the water, win!
  */
 Player.prototype.win = function() {
+    // By default within setTimeout(), the this keyword will be set to the global object.
+    // When working with class methods that require this to refer to class instances,
+    // you may explicitly bind this to the callback fucntion, in order to maintain the instance.
     setTimeout(function(){
         alert("You win!");
         this.init();
-    }.bind(this), 500); // add the bind method
+    }.bind(this), 500);
     
-}
-
-/**
- * Update the player's position, required method for game
- * @param dt - A time delta between ticks
- */
-Player.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-}
-
-/**
- * @description Draw the player on the screen, required method for game
- */
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
 /**
